@@ -1,3 +1,4 @@
+-- result of `vcpkg install glib` should be visible to cl.exe
 workspace "libvcp"
   configurations {"Release"}
   project "libvcp"
