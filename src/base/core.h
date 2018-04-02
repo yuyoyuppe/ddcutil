@@ -40,7 +40,7 @@
 #define BASE_CORE_H_
 
 /** \cond */
-#include <linux/limits.h>
+#include <climits>
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -66,18 +66,13 @@ void init_msg_control();
 // For aborting out of shared library
 //
 #ifdef OBSOLETE
-void register_jmp_buf(jmp_buf* jb);
+void register_jmp_buf(jmp_buf * jb);
 #endif
 
 #ifdef UNUSED
-void ddc_abort(
-      const char * funcname,
-      const int    lineno,
-      const char * fn,
-      int          status);
+void ddc_abort(const char * funcname, const int lineno, const char * fn, int status);
 
-#define DDC_ABORT(status) \
-   ddc_abort(__func__, __LINE__, __FILE__, status)
+#define DDC_ABORT(status) ddc_abort(__func__, __LINE__, __FILE__, status)
 #endif
 
 #ifdef OBSOLETE
@@ -91,12 +86,12 @@ extern DDCA_Global_Failure_Information global_failure_information;
 
 /** Byte of standard call options */
 typedef Byte Call_Options;
-#define CALLOPT_NONE         0x00    ///< no options
-#define CALLOPT_ERR_MSG      0x80    ///< issue message if error
+#define CALLOPT_NONE 0x00    ///< no options
+#define CALLOPT_ERR_MSG 0x80 ///< issue message if error
 // #define CALLOPT_ERR_ABORT    0x40    ///< terminate execution if error
-#define CALLOPT_RDONLY       0x20    ///< open read-only
-#define CALLOPT_WARN_FINDEX  0x10    ///< issue warning msg re hiddev_field_info.field_index change
-#define CALLOPT_FORCE        0x08    ///< ignore various validity checks
+#define CALLOPT_RDONLY 0x20      ///< open read-only
+#define CALLOPT_WARN_FINDEX 0x10 ///< issue warning msg re hiddev_field_info.field_index change
+#define CALLOPT_FORCE 0x08       ///< ignore various validity checks
 
 char * interpret_call_options_t(Call_Options calloptions);
 
@@ -106,9 +101,10 @@ char * interpret_call_options_t(Call_Options calloptions);
 // but requires a cast by the caller, so loses type checking.
 // How useful will this be?
 
-typedef struct {
-   int      rc;
-   void *   result;
+typedef struct
+{
+  int    rc;
+  void * result;
 } RC_And_Result;
 #endif
 
@@ -139,35 +135,35 @@ char *            output_level_name(DDCA_Output_Level val);
 // Trace message control
 //
 
-extern bool dbgtrc_show_time;  // include elapsed time in debug/trace timestamps
+extern bool dbgtrc_show_time; // include elapsed time in debug/trace timestamps
 
 void add_traced_function(const char * funcname);
-bool is_traced_function( const char * funcname);
+bool is_traced_function(const char * funcname);
 void show_traced_functions();
 
 void add_traced_file(const char * filename);
-bool is_traced_file( const char * filename);
+bool is_traced_file(const char * filename);
 void show_traced_files();
 
 typedef enum {
- TRC_BASE = 0x80,
- TRC_I2C  = 0x40,
- TRC_ADL  = 0x20,
- TRC_DDC  = 0x10,
- TRC_USB  = 0x08,
- TRC_TOP  = 0x04,
- TRC_ENV  = 0x02,
+  TRC_BASE = 0x80,
+  TRC_I2C  = 0x40,
+  TRC_ADL  = 0x20,
+  TRC_DDC  = 0x10,
+  TRC_USB  = 0x08,
+  TRC_TOP  = 0x04,
+  TRC_ENV  = 0x02,
 
- TRC_NEVER  = 0x00,
- TRC_ALWAYS = 0xff
+  TRC_NEVER  = 0x00,
+  TRC_ALWAYS = 0xff
 } Trace_Group;
 
 #define TRC_NONE TRC_NEVER
 
 Trace_Group trace_class_name_to_value(char * name);
-void set_trace_levels(Trace_Group trace_flags);
-char * get_active_trace_group_names();
-void show_trace_groups();
+void        set_trace_levels(Trace_Group trace_flags);
+char *      get_active_trace_group_names();
+void        show_trace_groups();
 
 bool is_tracing(Trace_Group trace_group, const char * filename, const char * funcname);
 
@@ -201,7 +197,7 @@ extern bool report_ddc_errors;
 bool is_reporting_ddc(Trace_Group trace_group, const char * filename, const char * funcname);
 #define IS_REPORTING_DDC() is_reporting_ddc(TRACE_GROUP, __FILE__, __func__)
 
-bool ddcmsg(Trace_Group trace_group, const char* funcname, const int lineno, const char* fn, char* format, ...);
+bool ddcmsg(Trace_Group trace_group, const char * funcname, const int lineno, const char * fn, char * format, ...);
 #define DDCMSG0(format, ...) ddcmsg(TRACE_GROUP, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
 /** Variant of **DDCMSG** that takes an explicit trace group as an argument.
@@ -211,8 +207,8 @@ bool ddcmsg(Trace_Group trace_group, const char* funcname, const int lineno, con
  * @param format
  * @param ...
  */
-#define DDCMSGX(debug_flag, trace_group, format, ...) \
-   ddcmsg(( (debug_flag) ) ? 0xff : (trace_group), __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define DDCMSGX(debug_flag, trace_group, format, ...)                                                                  \
+  ddcmsg(((debug_flag)) ? 0xff : (trace_group), __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
 
 /** Macro that wrappers function **ddcmsg()**, passing the current TRACE_GROUP,
@@ -222,9 +218,8 @@ bool ddcmsg(Trace_Group trace_group, const char* funcname, const int lineno, con
  * @param format
  * @param ...
  */
-#define DDCMSG(debug_flag, format, ...) \
-   ddcmsg(( (debug_flag) ) ? 0xff : (TRACE_GROUP), __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
-
+#define DDCMSG(debug_flag, format, ...)                                                                                \
+  ddcmsg(((debug_flag)) ? 0xff : (TRACE_GROUP), __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
 
 // Show report levels for all types
@@ -235,59 +230,56 @@ void show_reporting();
 // Issue messages of various types
 //
 
-void severemsg(
-        const char * funcname,
-        const int    lineno,
-        const char * fn,
-        char *       format,
-        ...);
+void severemsg(const char * funcname, const int lineno, const char * fn, char * format, ...);
 
-bool dbgtrc(
-        Trace_Group  trace_group,
-        const char * funcname,
-        const int    lineno,
-        const char * fn,
-        char *       format,
-        ...);
+bool dbgtrc(Trace_Group trace_group, const char * funcname, const int lineno, const char * fn, char * format, ...);
 
 
-#define SEVEREMSG(          format, ...) \
-   severemsg(          __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define SEVEREMSG(format, ...) severemsg(__func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
 
 // cannot map to dbgtrc, writes to stderr, not stdout
 // #define SEVEREMSG(format, ...) dbgtrc(0xff,       __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
-#define DBGMSG(            format, ...) dbgtrc(0xff, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define DBGMSG(format, ...) dbgtrc(0xff, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 // workaround: if -Wpedantic, ISO C does not allow variadic macro calls that have no variable arguments
-#define DBGMSG0(           text) dbgtrc(0xff, __func__, __LINE__, __FILE__, text)
+#define DBGMSG0(text) dbgtrc(0xff, __func__, __LINE__, __FILE__, text)
 
-#define DBGMSF(debug_flag, format, ...) \
-   do { if (debug_flag) dbgtrc( 0xff, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__); }  while(0)
-#define DBGMSF0(debug_flag, text) \
-   do { if (debug_flag) dbgtrc( 0xff, __func__, __LINE__, __FILE__, text); }  while(0)
+#define DBGMSF(debug_flag, format, ...)                                                                                \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    if(debug_flag)                                                                                                     \
+      dbgtrc(0xff, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__);                                               \
+  } while(0)
+#define DBGMSF0(debug_flag, text)                                                                                      \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    if(debug_flag)                                                                                                     \
+      dbgtrc(0xff, __func__, __LINE__, __FILE__, text);                                                                \
+  } while(0)
 
 
-#define TRCMSG(            format, ...) \
-   dbgtrc(TRACE_GROUP, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define TRCMSG(format, ...) dbgtrc(TRACE_GROUP, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
 // which of these are really useful?
 // not currently used: TRCALWAYS, TRCMSGTG, TRCMSGTF
-#define TRCALWAYS(            format, ...) \
-   dbgtrc(0xff,        __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
-#define TRCMSGTG(trace_group, format, ...) \
-   dbgtrc(trace_group, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
-#define TRCMSGTF(trace_flag, format, ...) \
-    do { if (trace_flag) dbgtrc(0xff, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__); }  while(0)
+#define TRCALWAYS(format, ...) dbgtrc(0xff, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define TRCMSGTG(trace_group, format, ...) dbgtrc(trace_group, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define TRCMSGTF(trace_flag, format, ...)                                                                              \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    if(trace_flag)                                                                                                     \
+      dbgtrc(0xff, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__);                                               \
+  } while(0)
 // alt: dbgtrc( ( (trace_flag) ? (0xff) : TRACE_GROUP ), __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
 // For messages that are issued either if tracing is enabled for the appropriate trace group or
 // if a debug flag is set.
-#define DBGTRC(debug_flag, trace_group, format, ...) \
-    dbgtrc( ( (debug_flag) ) ? 0xff : (trace_group), __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define DBGTRC(debug_flag, trace_group, format, ...)                                                                   \
+  dbgtrc(((debug_flag)) ? 0xff : (trace_group), __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
-#define DBGTRC0(debug_flag, trace_group, format) \
-    dbgtrc( ( (debug_flag) ) ? 0xff : (trace_group), __func__, __LINE__, __FILE__, format)
+#define DBGTRC0(debug_flag, trace_group, format)                                                                       \
+  dbgtrc(((debug_flag)) ? 0xff : (trace_group), __func__, __LINE__, __FILE__, format)
 
 
 //
@@ -295,31 +287,15 @@ bool dbgtrc(
 //
 
 #ifdef OLD
-void report_ioctl_error_old(
-      int         errnum,
-      const char* funcname,
-      int         lineno,
-      char*       filename,
-      bool        fatal);
+void report_ioctl_error_old(int errnum, const char * funcname, int lineno, char * filename, bool fatal);
 #endif
 
-void report_ioctl_error(
-      const char * ioctl_name,
-      int          errnum,
-      const char * funcname,
-      const char * filename,
-      int          lineno);
+void report_ioctl_error(const char * ioctl_name, int errnum, const char * funcname, const char * filename, int lineno);
 
-#define REPORT_IOCTL_ERROR(_ioctl_name, _errnum) \
-   report_ioctl_error(_ioctl_name, _errnum, __func__, __FILE__, __LINE__);
+#define REPORT_IOCTL_ERROR(_ioctl_name, _errnum) report_ioctl_error(_ioctl_name, _errnum, __func__, __FILE__, __LINE__);
 
 // reports a program logic error
-void program_logic_error(
-      const char * funcname,
-      const int    lineno,
-      const char * fn,
-      char *       format,
-      ...);
+void program_logic_error(const char * funcname, const int lineno, const char * fn, char * format, ...);
 
 /** @def PROGRAM_LOGIC_ERROR(format,...)
  *  Wraps call to program_logic_error()
@@ -327,25 +303,19 @@ void program_logic_error(
  *  Reports an error in program logic.
  * @ingroup abnormal_termination
  */
-#define PROGRAM_LOGIC_ERROR(format, ...) \
-   program_logic_error(__func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define PROGRAM_LOGIC_ERROR(format, ...) program_logic_error(__func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
 
 #ifdef OLD
 void terminate_execution_on_error(
-        Trace_Group  trace_group,
-        const char * funcname,
-        const int    lineno,
-        const char * fn,
-        char *       format,
-        ...);
+  Trace_Group trace_group, const char * funcname, const int lineno, const char * fn, char * format, ...);
 
 /** @def TERMINATE_EXECUTION_ON_ERROR(format,...)
  *  Wraps call to terminate_execution_on_error()
  * @ingroup abnormal_termination
  */
-#define TERMINATE_EXECUTION_ON_ERROR(format, ...) \
-   terminate_execution_on_error(TRACE_GROUP, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+#define TERMINATE_EXECUTION_ON_ERROR(format, ...)                                                                      \
+  terminate_execution_on_error(TRACE_GROUP, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 #endif
 
 #endif /* BASE_CORE_H_ */
