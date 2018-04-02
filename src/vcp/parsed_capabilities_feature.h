@@ -38,27 +38,23 @@
 
 #define CAPABILITIES_FEATURE_MARKER "VCPF"
 /** Parsed description of a VCP Feature in a capabilities string. */
-typedef struct {
-     char              marker[4];     ///<  always "VCPF"
-     Byte              feature_id;    ///<  VCP feature code
+typedef struct
+{
+  char marker[4];  ///<  always "VCPF"
+  Byte feature_id; ///<  VCP feature code
 #ifdef OLD_BVA
-     Byte_Value_Array  values;
+  Byte_Value_Array values;
 #endif
-     Byte_Bit_Flags    bbflags;       // alternative
-     char *            value_string;  ///< value substring from capabilities string
+  Byte_Bit_Flags bbflags;      // alternative
+  char *         value_string; ///< value substring from capabilities string
 } Capabilities_Feature_Record;
 
-Capabilities_Feature_Record * new_capabilities_feature(
-      Byte   feature_id,
-      char * value_string_start,
-      int    value_string_len);
+Capabilities_Feature_Record * new_capabilities_feature(Byte   feature_id,
+                                                       char * value_string_start,
+                                                       size_t value_string_len);
 
-void free_capabilities_feature(
-      Capabilities_Feature_Record * vfr);
+void free_capabilities_feature(Capabilities_Feature_Record * vfr);
 
-void report_capabilities_feature(
-      Capabilities_Feature_Record * vfr,
-      DDCA_MCCS_Version_Spec        vcp_version,
-      int                           depth);
+void report_capabilities_feature(Capabilities_Feature_Record * vfr, DDCA_MCCS_Version_Spec vcp_version, int depth);
 
 #endif /* PARSED_CAPABILITIES_H */

@@ -182,7 +182,7 @@ char *    summarize_single_vcp_value_r(DDCA_Single_Vcp_Value * valrec, char * bu
                                  NULL, // allocate buffer,
                                  0);   //    bufsz
 
-        int space_remaining = bufsz - strlen(buffer);
+        size_t space_remaining = bufsz - strlen(buffer);
         if(strlen(buf0) < space_remaining)
           strcat(buffer, buf0);
         else
@@ -388,7 +388,7 @@ void report_vcp_value_set(Vcp_Value_Set vset, int depth)
 {
   rpt_vstring(depth, "Vcp_Value_Set at %p", vset);
   rpt_vstring(depth + 1, "value count: %d", vset->len);
-  int ndx = 0;
+  size_t ndx = 0;
   for(; ndx < vset->len; ndx++)
   {
     report_single_vcp_value(g_ptr_array_index(vset, ndx), depth + 1);

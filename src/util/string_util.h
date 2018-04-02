@@ -48,20 +48,22 @@ char * bool_repr(int value);
 
 #ifdef DEPRECATED
 // use library function g_strlcpy() instead
-#define SAFE_STRNCPY(dest, src, buflen) \
-   do { \
-      strncpy(dest, src, (buflen) ); \
-      if (buflen > 0) \
-         dest[buflen-1] = '\0'; \
-   } while(0)
+#define SAFE_STRNCPY(dest, src, buflen)                                                                                \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    strncpy(dest, src, (buflen));                                                                                      \
+    if(buflen > 0)                                                                                                     \
+      dest[buflen - 1] = '\0';                                                                                         \
+  } while(0)
 #endif
 
-#define SAFE_SNPRINTF(buf, bufsz, fmt, ...) \
-   do { \
-      snprintf(buf, bufsz, fmt, __VA_ARGS__ ); \
-      if (bufsz > 0) \
-         buf[bufsz-1] = '\0'; \
-   } while(0)
+#define SAFE_SNPRINTF(buf, bufsz, fmt, ...)                                                                            \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    snprintf(buf, bufsz, fmt, __VA_ARGS__);                                                                            \
+    if(bufsz > 0)                                                                                                      \
+      buf[bufsz - 1] = '\0';                                                                                           \
+  } while(0)
 
 //
 // String functions (other than hex)
@@ -73,8 +75,8 @@ bool   str_starts_with(const char * value_to_test, const char * start_part);
 bool   str_ends_with(const char * value_to_test, const char * end_part);
 bool   str_all_printable(const char * s);
 char * strupper(char * s);
-char * strdup_uc(const char* s);
-char * strjoin( const char ** pieces, const int ct, const char * sepstr);
+char * strdup_uc(const char * s);
+char * strjoin(const char ** pieces, const int ct, const char * sepstr);
 char * chars_to_string(const char * start, int len);
 char * strtrim(const char * s);
 char * strtrim_r(const char * s, char * buffer, int bufsz);
@@ -87,26 +89,25 @@ bool   sbuf_append(char * buf, int bufsz, char * sepstr, char * nextval);
 char * ascii_strcasestr(const char * haystack, const char * needle);
 
 typedef bool (*String_Comp_Func)(const char * a, const char * b);
-int matches_by_func(    const char * word, const char ** match_list, String_Comp_Func  comp_func);
+int matches_by_func(const char * word, const char ** match_list, String_Comp_Func comp_func);
 int exactly_matches_any(const char * word, const char ** match_list);
-int starts_with_any(    const char * word, const char ** match_list);
+int starts_with_any(const char * word, const char ** match_list);
 
 /** pointer to null-terminated array of strings */
-typedef char** Null_Terminated_String_Array;
-void ntsa_free(  Null_Terminated_String_Array string_array, bool free_strings);
-int  ntsa_length(Null_Terminated_String_Array string_array);
-void ntsa_show(  Null_Terminated_String_Array string_array);
-int  ntsa_findx( Null_Terminated_String_Array string_array, char * value, String_Comp_Func func);
-int  ntsa_find(  Null_Terminated_String_Array string_array, char * value);
-Null_Terminated_String_Array  ntsa_join(  Null_Terminated_String_Array a1, Null_Terminated_String_Array a2, bool dup);
+typedef char **              Null_Terminated_String_Array;
+void                         ntsa_free(Null_Terminated_String_Array string_array, bool free_strings);
+int                          ntsa_length(Null_Terminated_String_Array string_array);
+void                         ntsa_show(Null_Terminated_String_Array string_array);
+int                          ntsa_findx(Null_Terminated_String_Array string_array, char * value, String_Comp_Func func);
+int                          ntsa_find(Null_Terminated_String_Array string_array, char * value);
+Null_Terminated_String_Array ntsa_join(Null_Terminated_String_Array a1, Null_Terminated_String_Array a2, bool dup);
 
-Null_Terminated_String_Array strsplit(const char * str_to_split, const char* delims);
-Null_Terminated_String_Array strsplit_maxlength(
-                                      const char * str_to_split,
-                                      uint16_t     max_piece_length,
-                                      const char * delims);
+Null_Terminated_String_Array strsplit(const char * str_to_split, const char * delims);
+Null_Terminated_String_Array strsplit_maxlength(const char * str_to_split,
+                                                uint16_t     max_piece_length,
+                                                const char * delims);
 
-GPtrArray * ntsa_to_g_ptr_array(Null_Terminated_String_Array ntsa);
+GPtrArray *                  ntsa_to_g_ptr_array(Null_Terminated_String_Array ntsa);
 Null_Terminated_String_Array g_ptr_array_to_ntsa(GPtrArray * garray);
 
 
@@ -121,44 +122,39 @@ bool str_to_int(const char * nptr, int * ival);
 // Hex value conversion.
 //
 
-bool hhs_to_byte_in_buf(const char * s,  Byte * result);    // converts null terminated string into buffer
+bool hhs_to_byte_in_buf(const char * s, Byte * result); // converts null terminated string into buffer
 bool any_one_byte_hex_string_to_byte_in_buf(const char * s, Byte * result);
-bool hhc_to_byte_in_buf(const char * hh, Byte * result);    // converts 2 characters at hh into buffer
+bool hhc_to_byte_in_buf(const char * hh, Byte * result); // converts 2 characters at hh into buffer
 #ifdef OLD
-Byte hhs_to_byte(char * s);                           // converts null terminated string
-Byte hhc_to_byte(char * hh);                          // converts 2 characters at hh
-void test_hhs_to_byte() ;
+Byte hhs_to_byte(char * s);  // converts null terminated string
+Byte hhc_to_byte(char * hh); // converts 2 characters at hh
+void test_hhs_to_byte();
 #endif
-int  hhs_to_byte_array(const char * hhs, Byte** pBa);
+int hhs_to_byte_array(const char * hhs, Byte ** pBa);
 
-char * hexstring(const Byte * bytes, int size);  // buffer returned must be freed
-char * hexstring_t(
-          const unsigned char * bytes,
-          int                   len);
-char * hexstring2(
-          const unsigned char * bytes,      // bytes to convert
-          int                   len,        // number of bytes
-          const char *          sepstr,     // separator string between hex digits
-          bool                  uppercase,  // use upper case hex characters
-          char *                buffer,     // buffer in which to return hex string
-          int                   bufsz);     // buffer size
+char * hexstring(const Byte * bytes, int size); // buffer returned must be freed
+char * hexstring_t(const unsigned char * bytes, int len);
+char * hexstring2(const unsigned char * bytes,     // bytes to convert
+                  int                   len,       // number of bytes
+                  const char *          sepstr,    // separator string between hex digits
+                  bool                  uppercase, // use upper case hex characters
+                  char *                buffer,    // buffer in which to return hex string
+                  int                   bufsz);                      // buffer size
 #ifdef DEPRECATED
-char * hexstring2_t(
-          const unsigned char * bytes,      // bytes to convert
-          int                   len,        // number of bytes
-          const char *          sepstr,     // separator string between hex digits
-          bool                  uppercase); // use upper case hex characters?
+char * hexstring2_t(const unsigned char * bytes,  // bytes to convert
+                    int                   len,    // number of bytes
+                    const char *          sepstr, // separator string between hex digits
+                    bool                  uppercase);              // use upper case hex characters?
 #endif
-char * hexstring3_t(
-          const unsigned char * bytes,      // bytes to convert
-          int                   len,        // number of bytes
-          const char *          sepstr,     // separator string between hex digits
-          uint8_t               hunk_size,  // separator string frequency
-          bool                  uppercase); // use upper case hex characters
+char * hexstring3_t(const unsigned char * bytes,     // bytes to convert
+                    int                   len,       // number of bytes
+                    const char *          sepstr,    // separator string between hex digits
+                    uint8_t               hunk_size, // separator string frequency
+                    bool                  uppercase);                 // use upper case hex characters
 
-void fhex_dump_indented(FILE * fh, const Byte* data,  int size, int indents);
-void fhex_dump(         FILE * fh, const Byte* bytes, int size);
-void hex_dump(                     const Byte* bytes, int size);
+void fhex_dump_indented(FILE * fh, const Byte * data, size_t size, int indents);
+void fhex_dump(FILE * fh, const Byte * bytes, size_t size);
+void hex_dump(const Byte * bytes, size_t size);
 
 
 //
@@ -167,7 +163,7 @@ void hex_dump(                     const Byte* bytes, int size);
 
 int f0putc(int c, FILE * stream);
 int f0puts(const char * s, FILE * stream);
-int f0printf( FILE * stream, const char * format, ...);
+int f0printf(FILE * stream, const char * format, ...);
 int vf0printf(FILE * stream, const char * format, va_list ap);
 
 
