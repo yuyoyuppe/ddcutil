@@ -29,7 +29,7 @@
 #define UDEV_UTIL_H_
 
 /** \cond */
-#include <glib-2.0/glib.h>
+#include <glib.h>
 #include <libudev.h>
 #include <stdint.h>
 /** \endcond */
@@ -37,15 +37,16 @@
 #define UDEV_DEVICE_SUMMARY_MARKER "UDSM"
 /** Summary information for one UDEV device
  */
-typedef struct udev_device_summary {
-   char         marker[4];        ///< always "UDSM"
-   const char * sysname;          ///< e.g. i2c-3
-   const char * devpath;          ///< device path
-   const char * sysattr_name;     ///< sysattr name
-   const char * subsystem;        ///< subsystem, e.g. usbmisc
+typedef struct udev_device_summary
+{
+  char         marker[4];    ///< always "UDSM"
+  const char * sysname;      ///< e.g. i2c-3
+  const char * devpath;      ///< device path
+  const char * sysattr_name; ///< sysattr name
+  const char * subsystem;    ///< subsystem, e.g. usbmisc
 } Udev_Device_Summary;
 
-void free_udev_device_summaries(GPtrArray* summaries);
+void        free_udev_device_summaries(GPtrArray * summaries);
 GPtrArray * summarize_udev_subsystem_devices(char * subsystem);
 GPtrArray * find_devices_by_sysattr_name(char * name);
 

@@ -31,7 +31,7 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include <glib-2.0/glib.h>
+#include <glib.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -414,6 +414,28 @@ String_Array * new_string_array(int size)
  * Note: Each character in delims is used as an individual test.
  * The full string is NOT a delimiter string.
  */
+
+char * strsep(char ** stringp, const char * delim)
+{
+  char * start = *stringp;
+  char * p;
+
+  p = (start != NULL) ? strpbrk(start, delim) : NULL;
+
+  if(p == NULL)
+  {
+    *stringp = NULL;
+  }
+  else
+  {
+    *p       = '\0';
+    *stringp = p + 1;
+  }
+
+  return start;
+}
+
+
 Null_Terminated_String_Array strsplit(const char * str_to_split, const char * delims)
 {
   bool debug      = false;

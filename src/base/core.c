@@ -39,7 +39,7 @@
 
 //* \cond */
 #include <assert.h>
-#include <glib-2.0/glib.h>
+#include <glib.h>
 #include <errno.h>
 #include <setjmp.h>
 #include <stdio.h>
@@ -49,7 +49,7 @@
 
 #include "util/data_structures.h"
 #include "util/debug_util.h"
-#include "util/file_util.h"
+//#include "util/file_util.h"
 #include "util/glib_util.h"
 #include "util/glib_string_util.h"
 #include "util/report_util.h"
@@ -93,8 +93,8 @@ FILE * FERR = NULL;
 #ifdef OVERKILL
 #define FOUT_STACK_SIZE 8
 
-static FILE* fout_stack[FOUT_STACK_SIZE];
-static int   fout_stack_pos = -1;
+static FILE * fout_stack[FOUT_STACK_SIZE];
+static int    fout_stack_pos = -1;
 #endif
 
 
@@ -104,9 +104,10 @@ static int   fout_stack_pos = -1;
  *
  * @ingroup output_redirection
  */
-void init_msg_control() {
-   FOUT = stdout;
-   FERR = stderr;
+void init_msg_control()
+{
+  FOUT = stdout;
+  FERR = stderr;
 }
 
 
@@ -121,19 +122,21 @@ void init_msg_control() {
  *
  * @ingroup output_redirection
  */
-void set_fout(FILE * fout) {
-   bool debug = false;
-   DBGMSF(debug, "fout = %p", fout);
-   FOUT = fout;
-   rpt_change_output_dest(fout);
+void set_fout(FILE * fout)
+{
+  bool debug = false;
+  DBGMSF(debug, "fout = %p", fout);
+  FOUT = fout;
+  rpt_change_output_dest(fout);
 }
 
 /** Redirect output that would normally go to **stdout** back to **stdout**.
  * @ingroup output_redirection
  */
-void set_fout_to_default() {
-   FOUT = stdout;
-   rpt_change_output_dest(stdout);
+void set_fout_to_default()
+{
+  FOUT = stdout;
+  rpt_change_output_dest(stdout);
 }
 
 /** Redirect output that would normally go to **stderr**..
@@ -141,16 +144,12 @@ void set_fout_to_default() {
  *  @param ferr pointer to output stream
  * @ingroup output_redirection
  */
-void set_ferr(FILE * ferr) {
-   FERR = ferr;
-}
+void set_ferr(FILE * ferr) { FERR = ferr; }
 
 /** Redirect output that would normally go to **stderr** back to **stderr**.
  * @ingroup output_redirection
  */
-void set_ferr_to_default() {
-   FERR = stderr;
-}
+void set_ferr_to_default() { FERR = stderr; }
 
 
 #ifdef OVERKILL
@@ -158,27 +157,28 @@ void set_ferr_to_default() {
 // Functions that allow for temporarily changing the output destination.
 
 
-void push_fout(FILE* new_dest) {
-   assert(fout_stack_pos < FOUT_STACK_SIZE-1);
-   fout_stack[++fout_stack_pos] = new_dest;
+void push_fout(FILE * new_dest)
+{
+  assert(fout_stack_pos < FOUT_STACK_SIZE - 1);
+  fout_stack[++fout_stack_pos] = new_dest;
 }
 
 
-void pop_fout() {
-   if (fout_stack_pos >= 0)
-      fout_stack_pos--;
+void pop_fout()
+{
+  if(fout_stack_pos >= 0)
+    fout_stack_pos--;
 }
 
 
-void reset_fout_stack() {
-   fout_stack_pos = 0;
-}
+void reset_fout_stack() { fout_stack_pos = 0; }
 
 
-FILE * cur_fout() {
-   // special handling for unpushed case because can't statically initialize
-   // output_dest_stack[0] to stdout
-   return (fout_stack_pos < 0) ? stdout : fout_stack[fout_stack_pos];
+FILE * cur_fout()
+{
+  // special handling for unpushed case because can't statically initialize
+  // output_dest_stack[0] to stdout
+  return (fout_stack_pos < 0) ? stdout : fout_stack[fout_stack_pos];
 }
 #endif
 
@@ -192,7 +192,7 @@ FILE * cur_fout() {
  *
  */
 
-static jmp_buf* global_abort_jmp_buf_ptr = NULL;
+static jmp_buf * global_abort_jmp_buf_ptr = NULL;
 
 // It's an error handler.  Do not dynamically allocate
 DDCA_Global_Failure_Information global_failure_information = {0};
@@ -203,9 +203,10 @@ DDCA_Global_Failure_Information global_failure_information = {0};
  *
  * @ingroup abnormal_termination
  */
-void register_jmp_buf(jmp_buf* jb) {
-   DBGMSG("setting global_abort_jmp_buf_ptr = %p", jb);
-   global_abort_jmp_buf_ptr = jb;
+void register_jmp_buf(jmp_buf * jb)
+{
+  DBGMSG("setting global_abort_jmp_buf_ptr = %p", jb);
+  global_abort_jmp_buf_ptr = jb;
 }
 #endif
 
@@ -228,34 +229,32 @@ void register_jmp_buf(jmp_buf* jb) {
  *  @ingroup abnormal_termination
  */
 /* coverity [+kill] avoid coverity memory leak warnings */
-void ddc_abort(
-      const char * funcname,
-      const int    lineno,
-      const char * fn,
-      int          status)
+void ddc_abort(const char * funcname, const int lineno, const char * fn, int status)
 {
-   show_backtrace(2);
+  show_backtrace(2);
 
 #ifdef OBSOLETE
-   DBGMSG("global_abort_jmp_buf_ptr = %p", global_abort_jmp_buf_ptr);
-   if (global_abort_jmp_buf_ptr) {
+  DBGMSG("global_abort_jmp_buf_ptr = %p", global_abort_jmp_buf_ptr);
+  if(global_abort_jmp_buf_ptr)
+  {
 
-      // save failure information in case it's of use at longjmp() return
-      global_failure_information.info_set_fg = true;
-      global_failure_information.status = status;
-      g_strlcpy(global_failure_information.funcname, funcname, sizeof(global_failure_information.funcname));
-      global_failure_information.lineno = lineno;
-      g_strlcpy(global_failure_information.fn, fn, sizeof(global_failure_information.fn));
+    // save failure information in case it's of use at longjmp() return
+    global_failure_information.info_set_fg = true;
+    global_failure_information.status      = status;
+    g_strlcpy(global_failure_information.funcname, funcname, sizeof(global_failure_information.funcname));
+    global_failure_information.lineno = lineno;
+    g_strlcpy(global_failure_information.fn, fn, sizeof(global_failure_information.fn));
 
-      longjmp(*global_abort_jmp_buf_ptr, status);
-   }
-   else {
+    longjmp(*global_abort_jmp_buf_ptr, status);
+  }
+  else
+  {
 #endif
-      // no point setting global_failure_information, we're outta here
-      f0puts("Terminating execution.\n", FERR);
-      exit(EXIT_FAILURE);     // or return status?
+    // no point setting global_failure_information, we're outta here
+    f0puts("Terminating execution.\n", FERR);
+    exit(EXIT_FAILURE); // or return status?
 #ifdef OBSOLETE
-   }
+  }
 #endif
 }
 #endif
@@ -265,15 +264,13 @@ void ddc_abort(
 // Standard call options
 //
 
-Value_Name_Table callopt_bitname_table2 = {
-      VN(CALLOPT_ERR_MSG),
- //   VN(CALLOPT_ERR_ABORT),
-      VN(CALLOPT_RDONLY),
-      VN(CALLOPT_WARN_FINDEX),
-      VN(CALLOPT_FORCE),
-      VN(CALLOPT_NONE),                // special entry
-      VN_END
-};
+Value_Name_Table callopt_bitname_table2 = {VN(CALLOPT_ERR_MSG),
+                                           //   VN(CALLOPT_ERR_ABORT),
+                                           VN(CALLOPT_RDONLY),
+                                           VN(CALLOPT_WARN_FINDEX),
+                                           VN(CALLOPT_FORCE),
+                                           VN(CALLOPT_NONE), // special entry
+                                           VN_END};
 
 
 #ifdef OLD
@@ -284,14 +281,16 @@ Value_Name_Table callopt_bitname_table2 = {
  *
  *  @return interpreted value
  */
-char * interpret_call_options(Call_Options calloptions) {
-   static char * buffer = NULL;
-   if (buffer) {
-      free(buffer);
-      buffer = NULL;
-   }
-   buffer = vnt_interpret_flags(calloptions, callopt_bitname_table2, false, "|");
-   return buffer;
+char * interpret_call_options(Call_Options calloptions)
+{
+  static char * buffer = NULL;
+  if(buffer)
+  {
+    free(buffer);
+    buffer = NULL;
+  }
+  buffer = vnt_interpret_flags(calloptions, callopt_bitname_table2, false, "|");
+  return buffer;
 }
 #endif
 
@@ -306,32 +305,35 @@ char * interpret_call_options(Call_Options calloptions) {
  *
  *  @return interpreted value
  */
-char * interpret_call_options_t(Call_Options calloptions) {
-   static GPrivate  callopts_buf_key = G_PRIVATE_INIT(g_free);
+char * interpret_call_options_t(Call_Options calloptions)
+{
+  static GPrivate callopts_buf_key = G_PRIVATE_INIT(g_free);
 
-   char * buf = g_private_get(&callopts_buf_key);
+  char * buf = g_private_get(&callopts_buf_key);
 
-   // GThread * this_thread = g_thread_self();
-   // printf("(%s) this_thread=%p, callopts_buf_key=%p, buf=%p\n",
-   //        __func__, this_thread, &callopts_buf_key, buf);
+  // GThread * this_thread = g_thread_self();
+  // printf("(%s) this_thread=%p, callopts_buf_key=%p, buf=%p\n",
+  //        __func__, this_thread, &callopts_buf_key, buf);
 
-   if (!buf) {
-      buf = g_new(char, 200);
-      g_private_set(&callopts_buf_key, buf);
-   }
+  if(!buf)
+  {
+    buf = g_new(char, 200);
+    g_private_set(&callopts_buf_key, buf);
+  }
 
-   char * buftemp = vnt_interpret_flags(calloptions, callopt_bitname_table2, false, "|");
-   g_strlcpy(buf, buftemp, 200);
-   free(buftemp);
+  char * buftemp = vnt_interpret_flags(calloptions, callopt_bitname_table2, false, "|");
+  g_strlcpy(buf, buftemp, 200);
+  free(buftemp);
 
-   return buf;
+  return buf;
 }
 
 
 #ifdef UNUSED
-char * interpret_call_options_a(Call_Options calloptions) {
-   char * buffer = vnt_interpret_flags(calloptions, callopt_bitname_table2, false, "|");
-   return buffer;
+char * interpret_call_options_a(Call_Options calloptions)
+{
+  char * buffer = vnt_interpret_flags(calloptions, callopt_bitname_table2, false, "|");
+  return buffer;
 }
 #endif
 
@@ -342,16 +344,12 @@ char * interpret_call_options_a(Call_Options calloptions) {
 #define SHOW_REPORTING_MIN_TITLE_SIZE 28
 
 
-static void
-print_simple_title_value(int    offset_start_to_title,
-                         char * title,
-                         int    offset_title_start_to_value,
-                         char * value)
+static void print_simple_title_value(int    offset_start_to_title,
+                                     char * title,
+                                     int    offset_title_start_to_value,
+                                     char * value)
 {
-   f0printf(FOUT, "%.*s%-*s%s\n",
-            offset_start_to_title,"",
-            offset_title_start_to_value, title,
-            value);
+  f0printf(FOUT, "%.*s%-*s%s\n", offset_start_to_title, "", offset_title_start_to_value, title, value);
 }
 
 
@@ -372,9 +370,7 @@ static DDCA_Output_Level output_level;
  *
  * \ingroup msglevel
  */
-DDCA_Output_Level get_output_level() {
-   return output_level;
-}
+DDCA_Output_Level get_output_level() { return output_level; }
 
 /** Sets the output level.
  *
@@ -382,9 +378,10 @@ DDCA_Output_Level get_output_level() {
  *
  *  \ingroup msglevel
  */
-void set_output_level(DDCA_Output_Level newval) {
-   // printf("(%s) newval=%s  \n", __func__, msgLevelName(newval) );
-   output_level = newval;
+void set_output_level(DDCA_Output_Level newval)
+{
+  // printf("(%s) newval=%s  \n", __func__, msgLevelName(newval) );
+  output_level = newval;
 }
 
 /** Gets the printable name of an output level.
@@ -394,22 +391,24 @@ void set_output_level(DDCA_Output_Level newval) {
  *
  *  \ingroup msglevel
  */
-char * output_level_name(DDCA_Output_Level val) {
-   char * result = NULL;
-   switch (val) {
-      case DDCA_OL_TERSE:
-         result = "Terse";
-         break;
-      case DDCA_OL_NORMAL:
-         result = "Normal";
-         break;
-      case DDCA_OL_VERBOSE:
-         result = "Verbose";
-         break;
-      // default unnecessary, case exhausts enum
-   }
-   // printf("(%s) val=%d 0x%02x, returning: %s\n", __func__, val, val, result);
-   return result;
+char * output_level_name(DDCA_Output_Level val)
+{
+  char * result = NULL;
+  switch(val)
+  {
+  case DDCA_OL_TERSE:
+    result = "Terse";
+    break;
+  case DDCA_OL_NORMAL:
+    result = "Normal";
+    break;
+  case DDCA_OL_VERBOSE:
+    result = "Verbose";
+    break;
+    // default unnecessary, case exhausts enum
+  }
+  // printf("(%s) val=%d 0x%02x, returning: %s\n", __func__, val, val, result);
+  return result;
 }
 
 
@@ -418,12 +417,11 @@ char * output_level_name(DDCA_Output_Level val) {
  *
  *  \ingroup msglevel
  */
-void show_output_level() {
-   // printf("Output level:           %s\n", output_level_name(output_level));
-   print_simple_title_value(SHOW_REPORTING_TITLE_START,
-                              "Output level: ",
-                              SHOW_REPORTING_MIN_TITLE_SIZE,
-                              output_level_name(output_level));
+void show_output_level()
+{
+  // printf("Output level:           %s\n", output_level_name(output_level));
+  print_simple_title_value(
+    SHOW_REPORTING_TITLE_START, "Output level: ", SHOW_REPORTING_MIN_TITLE_SIZE, output_level_name(output_level));
 }
 
 
@@ -435,22 +433,19 @@ void show_output_level() {
  *
  */
 
-bool dbgtrc_show_time = false;    ///< include elapsed time in debug/trace output
+bool dbgtrc_show_time = false; ///< include elapsed time in debug/trace output
 
-static
-Value_Name_Title_Table trace_group_table = {
-      VNT(TRC_BASE, "BASE"),
-      VNT(TRC_I2C, "I2C"),
+static Value_Name_Title_Table trace_group_table = {VNT(TRC_BASE, "BASE"),
+                                                   VNT(TRC_I2C, "I2C"),
 #ifdef HAVE_ADL
-      VNT(TRC_ADL, "ADL"),
+                                                   VNT(TRC_ADL, "ADL"),
 #endif
-      VNT(TRC_DDC, "DDC"),
-      VNT(TRC_USB, "USB"),
-      VNT(TRC_TOP, "TOP"),
-      VNT(TRC_ENV, "ENV"),
-      VNT_END
-};
-const int trace_group_ct = ARRAY_SIZE(trace_group_table)-1;
+                                                   VNT(TRC_DDC, "DDC"),
+                                                   VNT(TRC_USB, "USB"),
+                                                   VNT(TRC_TOP, "TOP"),
+                                                   VNT(TRC_ENV, "ENV"),
+                                                   VNT_END};
+const int trace_group_ct = ARRAY_SIZE(trace_group_table) - 1;
 
 
 /** Given a trace group name, returns its identifier.
@@ -462,16 +457,16 @@ const int trace_group_ct = ARRAY_SIZE(trace_group_table)-1;
  *
  *  /ingroup dbgtrace
  */
-Trace_Group trace_class_name_to_value(char * name) {
-   return (Trace_Group) vnt_find_id(
-                           trace_group_table,
-                           name,
-                           true,      // search title field
-                           true,      // ignore-case
-                           TRC_NEVER);
+Trace_Group trace_class_name_to_value(char * name)
+{
+  return (Trace_Group)vnt_find_id(trace_group_table,
+                                  name,
+                                  true, // search title field
+                                  true, // ignore-case
+                                  TRC_NEVER);
 }
 
-static Byte trace_levels = TRC_NEVER;   // 0x00
+static Byte trace_levels = TRC_NEVER; // 0x00
 
 
 /** Specifies the trace groups to be traced.
@@ -480,11 +475,12 @@ static Byte trace_levels = TRC_NEVER;   // 0x00
  *
  * @ingroup dbgtrace
  */
-void set_trace_levels(Trace_Group trace_flags) {
-   bool debug = false;
-   DBGMSF(debug, "trace_flags=0x%02x\n", trace_flags);
+void set_trace_levels(Trace_Group trace_flags)
+{
+  bool debug = false;
+  DBGMSF(debug, "trace_flags=0x%02x\n", trace_flags);
 
-   trace_levels = trace_flags;
+  trace_levels = trace_flags;
 }
 
 
@@ -493,22 +489,23 @@ void set_trace_levels(Trace_Group trace_flags) {
 // are used only for testing and (b) there will be at most a handful of entries in the
 // tables, a simpler GPtrArray implementation is used.
 
-static GPtrArray  * traced_function_table = NULL;
-static GPtrArray  * traced_file_table     = NULL;
+static GPtrArray * traced_function_table = NULL;
+static GPtrArray * traced_file_table     = NULL;
 
 
 /** Adds a function to the list of functions to be traced.
  *
  *  @param funcname function name
  */
-void add_traced_function(const char * funcname) {
-   // printf("(%s) funcname=|%s|\n", __func__, funcname);
+void add_traced_function(const char * funcname)
+{
+  // printf("(%s) funcname=|%s|\n", __func__, funcname);
 
-   if (!traced_function_table)
-      traced_function_table = g_ptr_array_new();
-   // n. g_ptr_array_find_with_equal_func() requires glib 2.54
-   if (gaux_string_ptr_array_find(traced_function_table, funcname) < 0)
-      g_ptr_array_add(traced_function_table, g_strdup(funcname));
+  if(!traced_function_table)
+    traced_function_table = g_ptr_array_new();
+  // n. g_ptr_array_find_with_equal_func() requires glib 2.54
+  if(gaux_string_ptr_array_find(traced_function_table, funcname) < 0)
+    g_ptr_array_add(traced_function_table, g_strdup(funcname));
 }
 
 /** Adds a file to the list of files to be traced.
@@ -520,26 +517,28 @@ void add_traced_function(const char * funcname) {
  *  @remark
  *  If the file name does not end in ".c", that suffix is appended.
  */
-void add_traced_file(const char * filename) {
-   if (!traced_file_table)
-      traced_file_table = g_ptr_array_new();
-   // n. g_ptr_array_find_with_equal_func() requires glib 2.54
+void add_traced_file(const char * filename)
+{
+  if(!traced_file_table)
+    traced_file_table = g_ptr_array_new();
+  // n. g_ptr_array_find_with_equal_func() requires glib 2.54
 
-   gchar * bname = g_path_get_basename(filename);
-   if (!str_ends_with(bname, ".c")) {
-      int newsz = strlen(bname) + 2 + 1;
-      gchar * temp = calloc(1, newsz);
-      strcpy(temp, bname);
-      strcat(temp, ".c");
-      free(bname);
-      bname = temp;
-   }
+  gchar * bname = g_path_get_basename(filename);
+  if(!str_ends_with(bname, ".c"))
+  {
+    int     newsz = strlen(bname) + 2 + 1;
+    gchar * temp  = calloc(1, newsz);
+    strcpy(temp, bname);
+    strcat(temp, ".c");
+    free(bname);
+    bname = temp;
+  }
 
-   if (gaux_string_ptr_array_find(traced_file_table, bname) < 0)
-      g_ptr_array_add(traced_file_table, bname);
-   else
-      free(bname);
-   // printf("(%s) filename=|%s|, bname=|%s|, found=%s\n", __func__, filename, bname, bool_repr(found));
+  if(gaux_string_ptr_array_find(traced_file_table, bname) < 0)
+    g_ptr_array_add(traced_file_table, bname);
+  else
+    free(bname);
+  // printf("(%s) filename=|%s|, bname=|%s|, found=%s\n", __func__, filename, bname, bool_repr(found));
 }
 
 
@@ -548,10 +547,11 @@ void add_traced_file(const char * filename) {
  *  @param funcname function name
  *  @return **true** if the function is being traced, **false** if not
  */
-bool is_traced_function(const char * funcname) {
-   bool result = (traced_function_table && gaux_string_ptr_array_find(traced_function_table, funcname) >= 0);
-   // printf("(%s) funcname=|%s|, returning: %s\n", __func__, funcname, bool_repr(result2));
-   return result;
+bool is_traced_function(const char * funcname)
+{
+  bool result = (traced_function_table && gaux_string_ptr_array_find(traced_function_table, funcname) >= 0);
+  // printf("(%s) funcname=|%s|, returning: %s\n", __func__, funcname, bool_repr(result2));
+  return result;
 }
 
 
@@ -560,58 +560,65 @@ bool is_traced_function(const char * funcname) {
  *  @param filename file name
  *  @return **true** if trace is enabled for all functions in the file, **false** if not
  */
-bool is_traced_file(const char * filename) {
-   char * bname = g_path_get_basename(filename);
-   bool result = (traced_file_table && gaux_string_ptr_array_find(traced_file_table, bname) >= 0);
-   // printf("(%s) filename=|%s|, bname=|%s|, returning: %s\n", __func__, filename, bname, bool_repr(result));
-   free(bname);
-   return result;
+bool is_traced_file(const char * filename)
+{
+  char * bname  = g_path_get_basename(filename);
+  bool   result = (traced_file_table && gaux_string_ptr_array_find(traced_file_table, bname) >= 0);
+  // printf("(%s) filename=|%s|, bname=|%s|, returning: %s\n", __func__, filename, bname, bool_repr(result));
+  free(bname);
+  return result;
 }
 
 
-static char * get_traced_functions_as_joined_string() {
-   char * result = NULL;
-   if (traced_function_table) {
-      g_ptr_array_sort(traced_function_table, gaux_ptr_scomp);
-      result = join_string_g_ptr_array(traced_function_table, ", ");
-   }
-   return result;
+static char * get_traced_functions_as_joined_string()
+{
+  char * result = NULL;
+  if(traced_function_table)
+  {
+    g_ptr_array_sort(traced_function_table, gaux_ptr_scomp);
+    result = join_string_g_ptr_array(traced_function_table, ", ");
+  }
+  return result;
 }
 
 
-static char * get_traced_files_as_joined_string() {
-   char * result = NULL;
-   if (traced_file_table) {
-      g_ptr_array_sort(traced_file_table, gaux_ptr_scomp);
-      result = join_string_g_ptr_array(traced_file_table, ", ");
-   }
-   return result;
+static char * get_traced_files_as_joined_string()
+{
+  char * result = NULL;
+  if(traced_file_table)
+  {
+    g_ptr_array_sort(traced_file_table, gaux_ptr_scomp);
+    result = join_string_g_ptr_array(traced_file_table, ", ");
+  }
+  return result;
 }
 
 
 /** Outputs a line reporting the traced function list.
  *  Output is written to the current **FOUT** device.
  */
-void show_traced_functions() {
-   char * buf = get_traced_functions_as_joined_string();
-   print_simple_title_value(SHOW_REPORTING_TITLE_START,
-                              "Traced functions: ",
-                              SHOW_REPORTING_MIN_TITLE_SIZE,
-                              (buf && (strlen(buf) > 0)) ? buf : "none");
-   free(buf);
+void show_traced_functions()
+{
+  char * buf = get_traced_functions_as_joined_string();
+  print_simple_title_value(SHOW_REPORTING_TITLE_START,
+                           "Traced functions: ",
+                           SHOW_REPORTING_MIN_TITLE_SIZE,
+                           (buf && (strlen(buf) > 0)) ? buf : "none");
+  free(buf);
 }
 
 
 /** Outputs a line reporting the traced file list.
  *  Output is written to the current **FOUT** device.
  */
-void show_traced_files() {
-   char * buf = get_traced_files_as_joined_string();
-   print_simple_title_value(SHOW_REPORTING_TITLE_START,
-                              "Traced files: ",
-                              SHOW_REPORTING_MIN_TITLE_SIZE,
-                              (buf && (strlen(buf) > 0)) ? buf : "none");
-   free(buf);
+void show_traced_files()
+{
+  char * buf = get_traced_files_as_joined_string();
+  print_simple_title_value(SHOW_REPORTING_TITLE_START,
+                           "Traced files: ",
+                           SHOW_REPORTING_MIN_TITLE_SIZE,
+                           (buf && (strlen(buf) > 0)) ? buf : "none");
+  free(buf);
 }
 
 
@@ -640,27 +647,29 @@ void show_traced_files() {
  * @ingroup dbgtrace
  *
  */
-bool is_tracing(Trace_Group trace_group, const char * filename, const char * funcname) {
-   bool result =  (trace_group == 0xff) || (trace_levels & trace_group); // is trace_group being traced?
+bool is_tracing(Trace_Group trace_group, const char * filename, const char * funcname)
+{
+  bool result = (trace_group == 0xff) || (trace_levels & trace_group); // is trace_group being traced?
 
-   result = result || is_traced_function(funcname) || is_traced_file(filename);
+  result = result || is_traced_function(funcname) || is_traced_file(filename);
 
-   // printf("(%s) trace_group = %02x, filename=%s, funcname=%s, traceLevels=0x%02x, returning %d\n",
-   //        __func__, trace_group, filename, funcname, trace_levels, result);
-   return result;
+  // printf("(%s) trace_group = %02x, filename=%s, funcname=%s, traceLevels=0x%02x, returning %d\n",
+  //        __func__, trace_group, filename, funcname, trace_levels, result);
+  return result;
 }
 
 
 /** Outputs a line reporting the active trace groups.
  *  Output is written to the current **FOUT** device.
  */
-void show_trace_groups() {
-   char * buf = vnt_interpret_flags(trace_levels, trace_group_table, true /* use title */, ", ");
-   print_simple_title_value(SHOW_REPORTING_TITLE_START,
-                              "Trace groups active: ",
-                              SHOW_REPORTING_MIN_TITLE_SIZE,
-                              (strlen(buf) == 0) ? "none" : buf);
-   free(buf);
+void show_trace_groups()
+{
+  char * buf = vnt_interpret_flags(trace_levels, trace_group_table, true /* use title */, ", ");
+  print_simple_title_value(SHOW_REPORTING_TITLE_START,
+                           "Trace groups active: ",
+                           SHOW_REPORTING_MIN_TITLE_SIZE,
+                           (strlen(buf) == 0) ? "none" : buf);
+  free(buf);
 }
 
 
@@ -696,8 +705,9 @@ bool report_ddc_errors = true;
  *  @remark
  *  This function is normally wrapped in function **IS_REPORTING_DDC()**
  */
-bool is_reporting_ddc(Trace_Group trace_group, const char * filename, const char * funcname) {
-  bool result = (is_tracing(trace_group,filename, funcname) || report_ddc_errors);
+bool is_reporting_ddc(Trace_Group trace_group, const char * filename, const char * funcname)
+{
+  bool result = (is_tracing(trace_group, filename, funcname) || report_ddc_errors);
   return result;
 }
 
@@ -715,39 +725,36 @@ bool is_reporting_ddc(Trace_Group trace_group, const char * filename, const char
  *
  * Normally, invocation of this function is wrapped in macro DDCMSG.
  */
-bool ddcmsg(Trace_Group  trace_group,
-            const char * funcname,
-            const int    lineno,
-            const char * filename,
-            char *       format,
-            ...)
+bool ddcmsg(Trace_Group trace_group, const char * funcname, const int lineno, const char * filename, char * format, ...)
 {
-   bool result = false;
-   bool debug_or_trace = is_tracing(trace_group, filename, funcname);
-   if (debug_or_trace || report_ddc_errors) {
-      result = true;
-      char buffer[200];
-      va_list(args);
-      va_start(args, format);
-      vsnprintf(buffer, 200, format, args);
-      if (debug_or_trace)
-         f0printf(FOUT, "(%s) DDC: %s\n", funcname, buffer);
-      else
-         f0printf(FOUT, "DDC: %s\n", buffer);
-      va_end(args);
-   }
-   return result;
+  bool result         = false;
+  bool debug_or_trace = is_tracing(trace_group, filename, funcname);
+  if(debug_or_trace || report_ddc_errors)
+  {
+    result = true;
+    char buffer[200];
+    va_list(args);
+    va_start(args, format);
+    vsnprintf(buffer, 200, format, args);
+    if(debug_or_trace)
+      f0printf(FOUT, "(%s) DDC: %s\n", funcname, buffer);
+    else
+      f0printf(FOUT, "DDC: %s\n", buffer);
+    va_end(args);
+  }
+  return result;
 }
 
 
 /** Tells whether DDC data errors are reported.
  *  Output is writtent to the current **FOUT** device.
  */
-void show_ddcmsg() {
-   print_simple_title_value(SHOW_REPORTING_TITLE_START,
-                              "Reporting DDC data errors: ",
-                              SHOW_REPORTING_MIN_TITLE_SIZE,
-                              bool_repr(report_ddc_errors));
+void show_ddcmsg()
+{
+  print_simple_title_value(SHOW_REPORTING_TITLE_START,
+                           "Reporting DDC data errors: ",
+                           SHOW_REPORTING_MIN_TITLE_SIZE,
+                           bool_repr(report_ddc_errors));
 }
 
 
@@ -760,13 +767,14 @@ void show_ddcmsg() {
  *
  * Output is written to the current **FOUT** device.
  */
-void show_reporting() {
-   show_output_level();
-   show_ddcmsg();
-   show_trace_groups();
-   show_traced_functions();
-   show_traced_files();
-   // f0puts("", FOUT);
+void show_reporting()
+{
+  show_output_level();
+  show_ddcmsg();
+  show_trace_groups();
+  show_traced_functions();
+  show_traced_files();
+  // f0puts("", FOUT);
 }
 
 
@@ -788,21 +796,16 @@ void show_reporting() {
  *  @remark
  *  n. used within macro **LOADFUNC** of adl_intf.c
  */
-void severemsg(
-        const char * funcname,
-        const int    lineno,
-        const char * filename,
-        char *       format,
-        ...)
+void severemsg(const char * funcname, const int lineno, const char * filename, char * format, ...)
 {
-      char buffer[200];
-      char buf2[250];
-      va_list(args);
-      va_start(args, format);
-      vsnprintf(buffer, 200, format, args);
-      snprintf(buf2, 250, "(%s) %s\n", funcname, buffer);
-      f0puts(buf2, FERR);
-      va_end(args);
+  char buffer[200];
+  char buf2[250];
+  va_list(args);
+  va_start(args, format);
+  vsnprintf(buffer, 200, format, args);
+  snprintf(buf2, 250, "(%s) %s\n", funcname, buffer);
+  f0puts(buf2, FERR);
+  va_end(args);
 }
 
 
@@ -824,52 +827,49 @@ void severemsg(
  *
  *  @return **true** if message was output, **false** if not
  */
-bool dbgtrc(
-        Trace_Group  trace_group,
-        const char * funcname,
-        const int    lineno,
-        const char * filename,
-        char *       format,
-        ...)
+bool dbgtrc(Trace_Group trace_group, const char * funcname, const int lineno, const char * filename, char * format, ...)
 {
-   static char * buffer = NULL;
-   static int    bufsz  = 200;     // initial value
-   static char * buf2   = NULL;
+  static char * buffer = NULL;
+  static int    bufsz  = 200; // initial value
+  static char * buf2   = NULL;
 
-   if (!buffer) {      // first call
-      buffer = calloc(bufsz,    sizeof(char));
-      buf2   = calloc(bufsz+60, sizeof(char));
-   }
+  if(!buffer)
+  { // first call
+    buffer = calloc(bufsz, sizeof(char));
+    buf2   = calloc(bufsz + 60, sizeof(char));
+  }
 
-   bool msg_emitted = false;
-   if ( is_tracing(trace_group, filename, funcname) ) {
+  bool msg_emitted = false;
+  if(is_tracing(trace_group, filename, funcname))
+  {
+    va_list(args);
+    va_start(args, format);
+    int ct = vsnprintf(buffer, bufsz, format, args);
+    va_end(args);
+    if(ct >= bufsz)
+    { // if buffer too small, reallocate
+      free(buffer);
+      free(buf2);
+
+      bufsz  = ct + 1;
+      buffer = calloc(bufsz, sizeof(char));
+      buf2   = calloc(bufsz + 50, sizeof(char));
       va_list(args);
       va_start(args, format);
-      int ct = vsnprintf(buffer, bufsz, format, args);
+      ct = vsnprintf(buffer, bufsz, format, args);
+      assert(ct < bufsz);
       va_end(args);
-      if (ct >= bufsz) {   // if buffer too small, reallocate
-         free(buffer);
-         free(buf2);
+    }
 
-         bufsz = ct+1;
-         buffer = calloc(bufsz, sizeof(char));
-         buf2   = calloc(bufsz+50, sizeof(char));
-         va_list(args);
-         va_start(args, format);
-         ct = vsnprintf(buffer, bufsz, format, args);
-         assert(ct < bufsz);
-         va_end(args);
-      }
+    if(dbgtrc_show_time)
+      snprintf(buf2, bufsz + 60, "[%s](%s) %s\n", formatted_elapsed_time(), funcname, buffer);
+    else
+      snprintf(buf2, bufsz + 60, "(%s) %s\n", funcname, buffer);
+    f0puts(buf2, FOUT); // no automatic terminating null
+    msg_emitted = true;
+  }
 
-      if (dbgtrc_show_time)
-         snprintf(buf2, bufsz+60, "[%s](%s) %s\n", formatted_elapsed_time(), funcname, buffer);
-      else
-         snprintf(buf2, bufsz+60, "(%s) %s\n", funcname, buffer);
-      f0puts(buf2, FOUT);    // no automatic terminating null
-      msg_emitted = true;
-   }
-
-   return msg_emitted;
+  return msg_emitted;
 }
 
 
@@ -890,21 +890,26 @@ bool dbgtrc(
  *
  *  Returns:         nothing
  */
-void report_ioctl_error_old(
-      int   errnum,
-      const char* funcname,   // const to avoid warning msg on references at compile time
-      int   lineno,
-      char* filename,
-      bool  fatal) {
-   int errsv = errno;
-   f0printf(FERR, "ioctl error in function %s at line %d in file %s: errno=%s\n",
-           funcname, lineno, filename, linux_errno_desc(errnum) );
-   // not worth the linkage issues:
-   // fprintf(stderr, "  %s\n", explain_errno_ioctl(errnum, filedes, request, data));
-   if (fatal) {
-      ddc_abort(funcname, lineno, filename, DDCL_INTERNAL_ERROR);
-   }
-   errno = errsv;
+void report_ioctl_error_old(int          errnum,
+                            const char * funcname, // const to avoid warning msg on references at compile time
+                            int          lineno,
+                            char *       filename,
+                            bool         fatal)
+{
+  int errsv = errno;
+  f0printf(FERR,
+           "ioctl error in function %s at line %d in file %s: errno=%s\n",
+           funcname,
+           lineno,
+           filename,
+           linux_errno_desc(errnum));
+  // not worth the linkage issues:
+  // fprintf(stderr, "  %s\n", explain_errno_ioctl(errnum, filedes, request, data));
+  if(fatal)
+  {
+    ddc_abort(funcname, lineno, filename, DDCL_INTERNAL_ERROR);
+  }
+  errno = errsv;
 }
 #endif
 
@@ -918,17 +923,11 @@ void report_ioctl_error_old(
  * @param  filename    file name of error
  * @param  lineno      line number of error
  */
-void report_ioctl_error(
-      const char * ioctl_name,
-      int          errnum,
-      const char * funcname,
-      const char * filename,
-      int          lineno)
+void report_ioctl_error(const char * ioctl_name, int errnum, const char * funcname, const char * filename, int lineno)
 {
-   int errsv = errno;
-   f0printf(FERR, "(%s) Error in ioctl(%s), errno=%s\n",
-           funcname, ioctl_name, linux_errno_desc(errnum) );
-   errno = errsv;
+  int errsv = errno;
+  f0printf(FERR, "(%s) Error in ioctl(%s), errno=\n", funcname, ioctl_name);
+  errno = errsv;
 }
 
 
@@ -945,12 +944,7 @@ void report_ioctl_error(
  *
  * @ingroup output_redirection
  */
-void program_logic_error(
-      const char * funcname,
-      const int    lineno,
-      const char * fn,
-      char *       format,
-      ...)
+void program_logic_error(const char * funcname, const int lineno, const char * fn, char * format, ...)
 {
   // assemble the error message
   char buffer[200];
@@ -961,13 +955,12 @@ void program_logic_error(
 
   // assemble the location message:
   char buf2[250];
-  snprintf(buf2, 250, "Program logic error in function %s at line %d in file %s:\n",
-                      funcname, lineno, fn);
+  snprintf(buf2, 250, "Program logic error in function %s at line %d in file %s:\n", funcname, lineno, fn);
 
   // don't combine into 1 line, might be very long.  just output 2 lines:
-  f0puts(buf2,   FERR);
+  f0puts(buf2, FERR);
   f0puts(buffer, FERR);
-  f0puts("\n",   FERR);
+  f0puts("\n", FERR);
 }
 
 
@@ -985,12 +978,7 @@ void program_logic_error(
  *
  * @ingroup output_redirection
  */
-void program_logic_error_fatal(
-      const char * funcname,
-      const int    lineno,
-      const char * fn,
-      char *       format,
-      ...)
+void program_logic_error_fatal(const char * funcname, const int lineno, const char * fn, char * format, ...)
 {
   // assemble the error message
   char buffer[200];
@@ -1000,19 +988,17 @@ void program_logic_error_fatal(
 
   // assemble the location message:
   char buf2[250];
-  snprintf(buf2, 250, "Program logic error in function %s at line %d in file %s:\n",
-                      funcname, lineno, fn);
+  snprintf(buf2, 250, "Program logic error in function %s at line %d in file %s:\n", funcname, lineno, fn);
 
   // don't combine into 1 line, might be very long.  just output 2 lines:
-  f0puts(buf2,   FERR);
+  f0puts(buf2, FERR);
   f0puts(buffer, FERR);
-  f0puts("\n",   FERR);
+  f0puts("\n", FERR);
 
   // fputs("Terminating execution.\n", stderr);
   ddc_abort(funcname, lineno, fn, DDCL_INTERNAL_ERROR);
 }
 #endif
-
 
 
 #ifdef UNUSED
@@ -1030,29 +1016,24 @@ void program_logic_error_fatal(
  *  @ingroup output_redirection
  */
 void terminate_execution_on_error(
-        Trace_Group   trace_group,
-        const char * funcname,
-        const int    lineno,
-        const char * filename,
-        char *       format,
-        ...)
+  Trace_Group trace_group, const char * funcname, const int lineno, const char * filename, char * format, ...)
 {
-   char buffer[200];
-   char buf2[250];
-   char * finalBuffer = buffer;
-   va_list(args);
-   va_start(args, format);
-   vsnprintf(buffer, 200, format, args);
+  char   buffer[200];
+  char   buf2[250];
+  char * finalBuffer = buffer;
+  va_list(args);
+  va_start(args, format);
+  vsnprintf(buffer, 200, format, args);
 
-   if ( is_tracing(trace_group, filename, funcname) ) {
-      snprintf(buf2, 250, "(%s) %s", funcname, buffer);
-      finalBuffer = buf2;
-   }
+  if(is_tracing(trace_group, filename, funcname))
+  {
+    snprintf(buf2, 250, "(%s) %s", funcname, buffer);
+    finalBuffer = buf2;
+  }
 
-   f0puts(finalBuffer, FERR);
-   f0puts("\n", FERR);
+  f0puts(finalBuffer, FERR);
+  f0puts("\n", FERR);
 
-   ddc_abort(funcname, lineno, filename, DDCL_INTERNAL_ERROR);
+  ddc_abort(funcname, lineno, filename, DDCL_INTERNAL_ERROR);
 }
 #endif
-

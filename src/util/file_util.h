@@ -29,22 +29,21 @@
 #define FILE_UTIL_H_
 
 /** \cond */
-#include <dirent.h>
-#include <glib-2.0/glib.h>
+#include <glib.h>
 #include <stdbool.h>
 /** \endcond */
 
-int    file_getlines(const char * fn, GPtrArray* line_array, bool verbose);
-char * file_get_first_line(const char * fn, bool verbose);
+int          file_getlines(const char * fn, GPtrArray * line_array, bool verbose);
+char *       file_get_first_line(const char * fn, bool verbose);
 GByteArray * read_binary_file(char * fn, int est_size, bool verbose);
 
 bool regular_file_exists(const char * fqfn);
 bool directory_exists(const char * fqfn);
 
 /** Filter function for get_filenames_by_filter() */
-typedef int (*Dirent_Filter)(const struct dirent *end);
+typedef int (*Dirent_Filter)(const struct dirent * end);
 GPtrArray * get_filenames_by_filter(const char * dirnames[], Dirent_Filter filter_func);
 
-int filename_for_fd(int fd, char** p_fn);
+int filename_for_fd(int fd, char ** p_fn);
 
 #endif /* FILE_UTIL_H_ */

@@ -30,12 +30,12 @@
 #define UTIL_OUTPUT_SINK_H_
 
 /** \cond */
-#include <glib-2.0/glib.h>
+#include <glib.h>
 #include <stdio.h>
 /** \endcond */
 
 /** Type of output sink */
-typedef enum {SINK_STDOUT, SINK_FILE, SINK_MEMORY} Output_Sink_Type;
+typedef enum { SINK_STDOUT, SINK_FILE, SINK_MEMORY } Output_Sink_Type;
 
 /** Opaque handle to output sink instance */
 typedef void * Output_Sink;
@@ -48,7 +48,7 @@ Output_Sink create_memory_sink(int initial_line_ct, int estimated_max_chars);
 
 int printf_sink(Output_Sink sink, const char * format, ...);
 
-GPtrArray *  read_sink(Output_Sink sink);
+GPtrArray * read_sink(Output_Sink sink);
 
 int close_sink(Output_Sink sink);
 

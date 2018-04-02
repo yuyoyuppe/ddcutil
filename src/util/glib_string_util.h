@@ -30,13 +30,13 @@
  */
 
 /** \cond */
-#include <glib-2.0/glib.h>
+#include <glib.h>
 /** \endcond */
 
 #ifndef GLIB_STRING_UTIL_H_
 #define GLIB_STRING_UTIL_H_
 
-char * join_string_g_ptr_array(GPtrArray* strings, char * sepstr);
+char * join_string_g_ptr_array(GPtrArray * strings, char * sepstr);
 
 int gaux_string_ptr_array_find(GPtrArray * haystack, const char * needle);
 
