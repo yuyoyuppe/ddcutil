@@ -1254,7 +1254,7 @@ uint32_t vnt_find_id(Value_Name_Title_Table table,
     char * comparand = (use_title) ? cur->title : cur->name;
     if(comparand)
     {
-      int comprc = (ignore_case) ? strcasecmp(s, comparand) : strcmp(s, comparand);
+      int comprc = (ignore_case) ? g_strcasecmp(s, comparand) : strcmp(s, comparand);
       if(comprc == 0)
       {
         result = cur->value;

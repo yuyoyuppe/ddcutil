@@ -65,8 +65,8 @@ static uint64_t * timestamp_history = NULL;
 uint64_t cur_realtime_nanosec()
 {
   // on Pi, __time_t resolves to long int
-
-  return clock_gettime();
+  // yuyoyuppe: we don't need it
+  return 0;
 }
 
 

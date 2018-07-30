@@ -539,7 +539,7 @@ Null_Terminated_String_Array strsplit_maxlength(const char * str_to_split,
         }
       }
     }
-    char * piece = strndup(start, end - start);
+    char * piece = g_strndup(start, end - start);
     g_ptr_array_add(pieces, piece);
     start = start + strlen(piece);
   }
